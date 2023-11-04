@@ -61,6 +61,12 @@ def openai_gpt_resumir_texto(transcricao_completa, nome_arquivo, openai):
         arquivo_texto.write(resumo_instagram)
         
     return resumo_instagram
+def ferramenta_ler_arquivo(nome_arquivo):
+    try:
+        with open(nome_arquivo, "r") as arquivo:
+            return arquivo.read()
+    except IOError as e:
+        print(f"Erro no carregamento de arquivo: {e}")
 def main():
     load_dotenv()
     
@@ -74,8 +80,10 @@ def main():
     
     modelo_whisper = "whisper-1"
     
-    transcricao_completa = openai_whisper_trascrever(caminho_audio, nome_arquivo, modelo_whisper, openai)
-    resumo_instagram = openai_gpt_resumir_texto( transcricao_completa, nome_arquivo, openai)
+    transcricao_completa = ferramenta_ler_arquivo("transcricoes/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.txt")  
+    resumo_instagram = ferramenta_ler_arquivo("transcricoes/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.txt") 
+    # transcricao_completa = openai_whisper_trascrever(caminho_audio, nome_arquivo, modelo_whisper, openai)
+    # resumo_instagram = openai_gpt_resumir_texto( transcricao_completa, nome_arquivo, openai)
 
 if __name__ == "__main__":
     
