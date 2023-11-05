@@ -144,6 +144,22 @@ def openai_gpt_gerar_texto_imagem(resumo_instagram, nome_arquivo, openai):
     
     return texto_para_imagem
 
+def openai_dalle_gerar_imagem(resolucao, resumo_para_imagem, nome_arquivo, openai, qtd_imagens = 1):
+    print("Gerando a imagem com o DALL-E ...")
+    
+    prompt_user = f"Uma pintura ultra futurista, textless, 3d que retrate: {resumo_para_imagem}"
+    
+    resposta = openai.Image.create(
+        prompt=prompt_user,
+        n = qtd_imagens,
+        size = resolucao
+    )
+    
+    print(resposta["data"][0].url)
+    
+    return resposta["data"][0]
+
+    
 def main():
     load_dotenv()
     
@@ -151,6 +167,10 @@ def main():
     nome_arquivo = "ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146"
 
     url_podcast = "https://www.youtube.com/watch?v=YZ6YZAvDHXA"
+    
+    resolucao = "1024x1024"
+    
+    openai.api_key = os.getenv("OPENAI_API_KEY")
     
     api_key = os.getenv("OPENAI_API_KEY")
     openai.api_key = api_key
@@ -165,7 +185,10 @@ def main():
     # hashtags = openai_gpt_criar_hashtag(resumo_instagram,nome_arquivo, openai)
     hashtags = ferramenta_ler_arquivo("hashtags/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.txt")
 
-    resumo_imagem_instagram = openai_gpt_gerar_texto_imagem(resumo_instagram, nome_arquivo, openai)
+    # resumo_imagem_instagram = openai_gpt_gerar_texto_imagem(resumo_instagram, nome_arquivo, openai)
+    resumo_imagem_instagram = ferramenta_ler_arquivo("texto_para_imagem/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.txt")
+    
+    imagem_gerada = openai_dalle_gerar_imagem(resolucao,resumo_imagem_instagram, nome_arquivo, openai)
     
 if __name__ == "__main__":
     
