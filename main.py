@@ -1,6 +1,7 @@
 import openai
 from dotenv import load_dotenv
 import os
+import requests
 
 def openai_whisper_trascrever(caminho_audio, nome_arquivo,modelo_whisper, openai):
     print("Transcrevendo o audio...")
@@ -155,20 +156,36 @@ def openai_dalle_gerar_imagem(resolucao, resumo_para_imagem, nome_arquivo, opena
         size = resolucao
     )
     
-    print(resposta["data"][0].url)
-    
-    return resposta["data"][0]
+    return resposta["data"]
 
+def ferramenta_download_imagem(nome_arquivo, imagem_gerada,qtd_imagens = 1):
+  lista_nome_imagens = []
+  try:
+    for contador_imagens in range(0,qtd_imagens):
+        caminho = imagem_gerada[contador_imagens].url
+        imagem = requests.get(caminho)
+
+        with open(f"{nome_arquivo}_{contador_imagens}.png", "wb") as arquivo_imagem:
+            arquivo_imagem.write(imagem.content)
+
+        lista_nome_imagens.append(f"{nome_arquivo}_{contador_imagens}.png")
+    return lista_nome_imagens
+  except:
+    print("Ocorreu um erro!")
+    return  None
     
 def main():
     load_dotenv()
     
-    caminho_audio = "podcasts/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.mp3"
-    nome_arquivo = "ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146"
+    # caminho_audio = "podcasts/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.mp3"
+    # nome_arquivo = "ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146"
+    caminho_audio = "podcasts/VideoApresentando a WandaFullHDsemefeitos.mp3"
+    nome_arquivo = "VideoApresentando a WandaFullHDsemefeitos"
 
     url_podcast = "https://www.youtube.com/watch?v=YZ6YZAvDHXA"
     
     resolucao = "1024x1024"
+    qtd_imagens = 4
     
     openai.api_key = os.getenv("OPENAI_API_KEY")
     
@@ -188,9 +205,11 @@ def main():
     # resumo_imagem_instagram = openai_gpt_gerar_texto_imagem(resumo_instagram, nome_arquivo, openai)
     resumo_imagem_instagram = ferramenta_ler_arquivo("texto_para_imagem/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.txt")
     
-    imagem_gerada = openai_dalle_gerar_imagem(resolucao,resumo_imagem_instagram, nome_arquivo, openai)
+    imagem_gerada = openai_dalle_gerar_imagem(resolucao,resumo_imagem_instagram, nome_arquivo, openai, qtd_imagens)
     
+    ferramenta_download_imagem(nome_arquivo, imagem_gerada,qtd_imagens)
 if __name__ == "__main__":
+    
     
     main()
    
