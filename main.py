@@ -109,6 +109,41 @@ def openai_gpt_criar_hashtag(resumo_instagram, nome_arquivo, openai):
     
     return hashtags
 
+
+def openai_gpt_gerar_texto_imagem(resumo_instagram, nome_arquivo, openai):
+    print("Gerando a saida de texto para criacao de imagens com o GPT ...")
+
+    prompt_sistema = """
+
+    - A saída deve ser uma única, do tamanho de um tweet, que seja capaz de descrever o conteúdo do texto para que possa ser transcrito como uma imagem.
+    - Não inclua hashtags
+
+    """
+
+    prompt_usuario =  f'Reescreva o texto a seguir, em uma frase, para que descrever o texto abaixo em um tweet: {resumo_instagram}'
+    
+    resposta = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system",
+             
+             "content": prompt_sistema
+             },
+            {
+                "role": "user",
+                "content":  prompt_usuario
+            }
+        ],
+        temperature=0.6
+    )
+    
+    texto_para_imagem = resposta["choices"][0]["message"]["content"]
+    
+    with open(f"texto_para_imagem/{nome_arquivo}.txt", "w", encoding="utf-8") as arquivo_texto:
+        arquivo_texto.write(texto_para_imagem)
+    
+    return texto_para_imagem
+
 def main():
     load_dotenv()
     
@@ -127,8 +162,11 @@ def main():
     # transcricao_completa = openai_whisper_trascrever(caminho_audio, nome_arquivo, modelo_whisper, openai)
     # resumo_instagram = openai_gpt_resumir_texto( transcricao_completa, nome_arquivo, openai)
     
-    hashtags = openai_gpt_criar_hashtag(resumo_instagram,nome_arquivo, openai)
+    # hashtags = openai_gpt_criar_hashtag(resumo_instagram,nome_arquivo, openai)
+    hashtags = ferramenta_ler_arquivo("hashtags/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.txt")
 
+    resumo_imagem_instagram = openai_gpt_gerar_texto_imagem(resumo_instagram, nome_arquivo, openai)
+    
 if __name__ == "__main__":
     
     main()
