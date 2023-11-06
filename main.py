@@ -2,7 +2,7 @@ import openai
 from dotenv import load_dotenv
 import os
 import requests
-
+from pydub import AudioSegment
 def openai_whisper_trascrever(caminho_audio, nome_arquivo,modelo_whisper, openai):
     print("Transcrevendo o audio...")
     
@@ -173,14 +173,33 @@ def ferramenta_download_imagem(nome_arquivo, imagem_gerada,qtd_imagens = 1):
   except:
     print("Ocorreu um erro!")
     return  None
+
+def transcricao_completa_nvidia(caminho_audio, nome_arquivo, modelo_whisper, openai):
+    print("Transcrevendo o audio...")
     
+    audio = open(caminho_audio, "rb")
+    
+    resposta = openai.Audio.transcribe(
+        api_key=openai.api_key,
+        model=modelo_whisper,
+        file =audio
+        
+    
+        
+ ) 
+    transcricao = resposta.text
+    
+    with open(f"transcricoes/{nome_arquivo}.txt", "w", encoding="utf-8") as arquivo_texto:
+        arquivo_texto.write(transcricao)
+        
+    return transcricao 
 def main():
     load_dotenv()
     
     # caminho_audio = "podcasts/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.mp3"
     # nome_arquivo = "ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146"
-    caminho_audio = "podcasts/VideoApresentando a WandaFullHDsemefeitos.mp3"
-    nome_arquivo = "VideoApresentando a WandaFullHDsemefeitos"
+    caminho_audio = "podcasts/tomp3.cc -Como a Inteligência Artificial IA irá revolucionar empresas e negócios ft Aster  AI 360 02.mp3"
+    nome_arquivo = "COmo a Inteligenca Aurtificial IA irá revolucionar empresas e negócios ft Aster  AI 360 02"
 
     url_podcast = "https://www.youtube.com/watch?v=YZ6YZAvDHXA"
     
@@ -200,14 +219,17 @@ def main():
     # resumo_instagram = openai_gpt_resumir_texto( transcricao_completa, nome_arquivo, openai)
     
     # hashtags = openai_gpt_criar_hashtag(resumo_instagram,nome_arquivo, openai)
-    hashtags = ferramenta_ler_arquivo("hashtags/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.txt")
+   # hashtags = ferramenta_ler_arquivo("hashtags/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.txt")
 
     # resumo_imagem_instagram = openai_gpt_gerar_texto_imagem(resumo_instagram, nome_arquivo, openai)
-    resumo_imagem_instagram = ferramenta_ler_arquivo("texto_para_imagem/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.txt")
+    #resumo_imagem_instagram = ferramenta_ler_arquivo("texto_para_imagem/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.txt")
     
-    imagem_gerada = openai_dalle_gerar_imagem(resolucao,resumo_imagem_instagram, nome_arquivo, openai, qtd_imagens)
+    #imagem_gerada = openai_dalle_gerar_imagem(resolucao,resumo_imagem_instagram, nome_arquivo, openai, qtd_imagens)
     
-    ferramenta_download_imagem(nome_arquivo, imagem_gerada,qtd_imagens)
+    #ferramenta_download_imagem(nome_arquivo, imagem_gerada,qtd_imagens)
+    
+    transcricao_completa_nvidia = openai_whisper_trascrever(caminho_audio, nome_arquivo, modelo_whisper, openai)
+    
 if __name__ == "__main__":
     
     
