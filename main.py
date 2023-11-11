@@ -198,11 +198,20 @@ def ferramenta_download_imagem(nome_arquivo, urls_imagens, qtd_imagens=1):
         print(f"Ocorreu um erro durante o download: {e}")
         return None
 
+   
+    print("lista_nome_imagens", lista_nome_imagens)
     return lista_nome_imagens
-def selecionar_imagem (Lista_nome_imagens):
-    lista_nome_imagens = []
-    
-    return lista_nome_imagens[int(input("Qual imagem você deseja selecionar? Informe o sufixo da imagem"))]
+def selecionar_imagem(lista_nome_imagens):
+    try:
+        index = int(input("Qual imagem você deseja selecionar? Informe o sufixo da imagem: "))
+        imagem_selecionada = lista_nome_imagens[index]
+        return imagem_selecionada
+    except ValueError:
+        print("Por favor, insira um número válido.")
+        return None  # Retorna None ou você pode adicionar uma lógica para nova tentativa ou saída
+    except IndexError:
+        print("Índice fora do intervalo.")
+        return None  # Retorna None ou você pode adicionar uma lógica para nova tentativa ou saída
 
 def ferramenta_converter_png_para_jpg(caminho_imagem_escolhida, nome_arquivo):
     img_png = Image.open(caminho_imagem_escolhida) 
@@ -310,7 +319,7 @@ def main():
     
     imagem_gerada = openai_dalle_gerar_imagem(resolucao,resumo_imagem_instagram, nome_arquivo, openai, qtd_imagens)
     print("imagem_gerada",imagem_gerada)
-    lista_imagens_geras =ferramenta_download_imagem(nome_arquivo, [imagem_gerada],qtd_imagens)
+    lista_imagens_geras = ferramenta_download_imagem(nome_arquivo, [imagem_gerada],qtd_imagens)
     
     caminho_imagem_escolhida = selecionar_imagem(lista_imagens_geras)
     #transcricao_completa_nvidia = openai_whisper_trascrever_em_partes(caminho_audio, nome_arquivo, modelo_whisper, openai)
