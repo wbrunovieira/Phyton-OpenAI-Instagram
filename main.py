@@ -144,6 +144,7 @@ def openai_gpt_gerar_texto_imagem(resumo_instagram, nome_arquivo, openai):
     texto_para_imagem = sanitize_filename(texto_para_imagem)
     print("nome do arquivo depois de sanitizar",texto_para_imagem)
     return texto_para_imagem
+
 def sanitize_filename(filename):
     # Substitui espaços por underscores
     sanitized = filename.replace(" ", "_").replace("ç", "c").replace("ã", "a")
@@ -169,35 +170,31 @@ def openai_dalle_gerar_imagem(resolucao, resumo_para_imagem, nome_arquivo, opena
     imagem_url = response.data[0].url
     print("imagem_url",imagem_url)
     
-    lista_nome_imagens = ferramenta_download_imagem(nome_arquivo, [imagem_url], qtd_imagens)
-    print("lista_nome_imagens", lista_nome_imagens)
-    return lista_nome_imagens
+    # lista_nome_imagens = ferramenta_download_imagem(nome_arquivo, [imagem_url], qtd_imagens)
+    # print("lista_nome_imagens", lista_nome_imagens)
+    return imagem_url
 def ferramenta_download_imagem(nome_arquivo, urls_imagens, qtd_imagens=1):
+    print("URLs recebidas na função:", urls_imagens)
     lista_nome_imagens = []
     if not urls_imagens:  # Verifica se a lista de URLs está vazia
         print("Nenhuma URL de imagem fornecida.")
         return None
 
     try:
-        for contador_imagens in range(qtd_imagens):
+        for url_imagem in urls_imagens:
+            print("Processando URL:", url_imagem)
+            resposta = requests.get(url_imagem)
             # Verifica se o índice está dentro do intervalo da lista
-            if contador_imagens >= len(urls_imagens):
-                print("O índice da lista de URLs de imagem está fora do alcance.")
-                break
-
-            caminho = urls_imagens[contador_imagens]
-            imagem = requests.get(caminho)
-
-            # Sanitiza o nome do arquivo
-            nome_arquivo_seguro = sanitize_filename(nome_arquivo)
-
-            nome_arquivo_completo = f"{nome_arquivo_seguro}_{contador_imagens}.png"
-            with open(nome_arquivo_completo, "wb") as arquivo_imagem:
-                arquivo_imagem.write(imagem.content)
-
-            lista_nome_imagens.append(nome_arquivo_completo)
+            if resposta.status_code == 200:
+                nome_arquivo_completo = f"{nome_arquivo}.png"
+                with open(nome_arquivo_completo, "wb") as arquivo_imagem:
+                    arquivo_imagem.write(resposta.content)
+                lista_nome_imagens.append(nome_arquivo_completo)
+            else:
+                print(f"Erro ao baixar a imagem: {url_imagem}")
+               
     except Exception as e:
-        print(f"Ocorreu um erro: {e}")
+        print(f"Ocorreu um erro durante o download: {e}")
         return None
 
     return lista_nome_imagens
@@ -272,12 +269,12 @@ def main():
     # caminho_audio = "podcasts/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.mp3"
     # nome_arquivo = "ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146"
     caminho_audio = "podcasts/tomp3.cc -Como a Inteligência Artificial IA irá revolucionar empresas e negócios ft Aster  AI 360 02.mp3"
-    nome_arquivo = "COmo a Inteligenca Aurtificial IA irá revolucionar empresas e negócios ft Aster  AI 360 02"
+    nome_arquivo = "nome-curto-para-o-video-longo"
 
     url_podcast = ""
     
     resolucao = "1024x1024"
-    qtd_imagens = 4
+    qtd_imagens = 1
     
     # openai.api_key = os.getenv("OPENAI_API_KEY")
     
@@ -300,8 +297,8 @@ def main():
     resumo_imagem_instagram = ferramenta_ler_arquivo("texto_para_imagem/ESSA_A_ PREVISÃO_ MAIS_ BIZARRA_PARA_O _FUTURO_ Os_Sócios_146.txt")
     
     imagem_gerada = openai_dalle_gerar_imagem(resolucao,resumo_imagem_instagram, nome_arquivo, openai, qtd_imagens)
-    
-    ferramenta_download_imagem(nome_arquivo, imagem_gerada,qtd_imagens)
+    print("imagem_gerada",imagem_gerada)
+    ferramenta_download_imagem(nome_arquivo, [imagem_gerada],qtd_imagens)
     
     #transcricao_completa_nvidia = openai_whisper_trascrever_em_partes(caminho_audio, nome_arquivo, modelo_whisper, openai)
     
