@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 import requests
 from pydub import AudioSegment
+from PIL import Image
 
 
 def openai_whisper_trascrever(caminho_audio, nome_arquivo,modelo_whisper, openai):
@@ -186,7 +187,7 @@ def ferramenta_download_imagem(nome_arquivo, urls_imagens, qtd_imagens=1):
             resposta = requests.get(url_imagem)
             # Verifica se o índice está dentro do intervalo da lista
             if resposta.status_code == 200:
-                nome_arquivo_completo = f"{nome_arquivo}.png"
+                nome_arquivo_completo = f"{nome_arquivo}0.png"
                 with open(nome_arquivo_completo, "wb") as arquivo_imagem:
                     arquivo_imagem.write(resposta.content)
                 lista_nome_imagens.append(nome_arquivo_completo)
@@ -198,6 +199,16 @@ def ferramenta_download_imagem(nome_arquivo, urls_imagens, qtd_imagens=1):
         return None
 
     return lista_nome_imagens
+def selecionar_imagem (Lista_nome_imagens):
+    lista_nome_imagens = []
+    
+    return lista_nome_imagens[int(input("Qual imagem você deseja selecionar? Informe o sufixo da imagem"))]
+
+def ferramenta_converter_png_para_jpg(caminho_imagem_escolhida, nome_arquivo):
+    img_png = Image.open(caminho_imagem_escolhida) 
+    img_png.save(caminho_imagem_escolhida.split(".")[0]+".jpg") 
+
+    return caminho_imagem_escolhida.split(".")[0] + ".jpg"
 
 def transcricao_completa_nvidia(caminho_audio, nome_arquivo, modelo_whisper, openai):
     print("Transcrevendo o audio...")
@@ -276,6 +287,7 @@ def main():
     resolucao = "1024x1024"
     qtd_imagens = 1
     
+    
     # openai.api_key = os.getenv("OPENAI_API_KEY")
     
     # api_key = os.getenv("OPENAI_API_KEY")
@@ -298,9 +310,12 @@ def main():
     
     imagem_gerada = openai_dalle_gerar_imagem(resolucao,resumo_imagem_instagram, nome_arquivo, openai, qtd_imagens)
     print("imagem_gerada",imagem_gerada)
-    ferramenta_download_imagem(nome_arquivo, [imagem_gerada],qtd_imagens)
+    lista_imagens_geras =ferramenta_download_imagem(nome_arquivo, [imagem_gerada],qtd_imagens)
     
+    caminho_imagem_escolhida = selecionar_imagem(lista_imagens_geras)
     #transcricao_completa_nvidia = openai_whisper_trascrever_em_partes(caminho_audio, nome_arquivo, modelo_whisper, openai)
+    
+    caminho_imagem_convertida = ferramenta_converter_png_para_jpg(caminho_imagem_escolhida, nome_arquivo)
     
 if __name__ == "__main__":
     
