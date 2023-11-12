@@ -6,8 +6,8 @@ import os
 import requests
 from pydub import AudioSegment
 from PIL import Image
-
-
+from instabot import Bot
+import shutil
 def openai_whisper_trascrever(caminho_audio, nome_arquivo,modelo_whisper, openai):
     print("Transcrevendo o audio...")
     
@@ -219,6 +219,14 @@ def ferramenta_converter_png_para_jpg(caminho_imagem_escolhida, nome_arquivo):
 
     return caminho_imagem_escolhida.split(".")[0] + ".jpg"
 
+def postar_instagram(caminho_imagem, texto, user, password):
+    if os.path.exists("config"):
+        shutil.rmtree("config")
+    bot = Bot()
+    
+    bot.login(username=user, password=password)
+
+    resposta = bot.upload_photo(caminho_imagem, caption=texto)
 def transcricao_completa_nvidia(caminho_audio, nome_arquivo, modelo_whisper, openai):
     print("Transcrevendo o audio...")
     
@@ -291,11 +299,13 @@ def main():
     caminho_audio = "podcasts/tomp3.cc -Como a Inteligência Artificial IA irá revolucionar empresas e negócios ft Aster  AI 360 02.mp3"
     nome_arquivo = "nome-curto-para-o-video-longo"
 
-    url_podcast = ""
+    url_podcast = "https://www.instagram.com/wb.digitalsolutions"
     
     resolucao = "1024x1024"
     qtd_imagens = 1
     
+    usuario_instagram = os.getenv("USER_INSTAGRAM")
+    senha_instagram = os.getenv("PASSWORD_INSTAGRAM")
     
     # openai.api_key = os.getenv("OPENAI_API_KEY")
     
@@ -325,6 +335,10 @@ def main():
     #transcricao_completa_nvidia = openai_whisper_trascrever_em_partes(caminho_audio, nome_arquivo, modelo_whisper, openai)
     
     caminho_imagem_convertida = ferramenta_converter_png_para_jpg(caminho_imagem_escolhida, nome_arquivo)
+    postar_instagram(caminho_imagem_convertida,
+                     f"{resumo_instagram} \n {hashtags} \n Link da WB Digital Solutions: {url_podcast}",
+                     usuario_instagram,
+                     senha_instagram)
     
 if __name__ == "__main__":
     
